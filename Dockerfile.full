@@ -1,0 +1,36 @@
+FROM mcr.microsoft.com/devcontainers/base:debian
+
+# Install bun
+RUN curl -fsSL https://bun.sh/install | bash \
+    && echo 'export BUN_INSTALL="$HOME/.bun"' >> /home/vscode/.bashrc \
+    && echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> /home/vscode/.bashrc
+
+ENV BUN_INSTALL="/home/vscode/.bun"
+ENV PATH="$BUN_INSTALL/bin:$PATH"
+
+# Install Playwright + Chromium
+ENV PLAYWRIGHT_BROWSERS_PATH="/home/vscode/.cache/ms-playwright"
+RUN npx playwright install --with-deps chromium
+
+# Install Android SDK
+RUN mkdir -p /opt/android-sdk/cmdline-tools \
+    && cd /tmp \
+    && curl -fsSL "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -o cmdline-tools.zip \
+    && unzip -q cmdline-tools.zip \
+    && mv cmdline-tools /opt/android-sdk/cmdline-tools/latest \
+    && rm cmdline-tools.zip
+
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"
+
+RUN yes | sdkmanager --licenses > /dev/null 2>&1 || true \
+    && sdkmanager "platform-tools" "platforms;android-34" "system-images;android-34;google_apis;x86_64" "emulator"
+
+# Create default emulator AVD
+RUN echo "no" | avdmanager create avd -n test-device -k "system-images;android-34;google_apis;x86_64" --device "pixel_6" --force
+
+# Install global tools as vscode user
+USER vscode
+RUN bun add -g convex agent-device
+USER root
