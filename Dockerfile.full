@@ -19,6 +19,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH="/home/vscode/.cache/ms-playwright"
 RUN npx playwright install --with-deps chromium \
     && chown -R vscode:vscode /home/vscode/.cache/ms-playwright
 
+# Install Java (required by Android SDK)
+RUN apt-get update && apt-get install -y default-jdk-headless && rm -rf /var/lib/apt/lists/*
+
 # Install Android SDK
 RUN mkdir -p /opt/android-sdk/cmdline-tools \
     && cd /tmp \
@@ -41,4 +44,7 @@ RUN echo "no" | avdmanager create avd -n test-device -k "system-images;android-3
 USER vscode
 RUN bun add -g convex agent-device
 
+# Symlink bun into system PATH for non-interactive SSH sessions
 USER root
+RUN ln -sf /home/vscode/.bun/bin/bun /usr/local/bin/bun \
+    && ln -sf /home/vscode/.bun/bin/bunx /usr/local/bin/bunx
