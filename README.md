@@ -6,10 +6,11 @@ Pre-built Docker images for DevPod cloud workspaces. Two variants:
 
 ### `ghcr.io/plasmapos/devcontainers/light:latest`
 For backend/tooling projects (dev-agent, seal, aqua):
-- Debian base + Node 22 (via devcontainer features)
+- Debian base + Node 22 (system-wide)
 - Bun (latest)
 - Convex CLI
-- Git, GH CLI
+- Claude Code CLI + Codex CLI
+- Git, GH CLI (via devcontainer features)
 
 ### `ghcr.io/plasmapos/devcontainers/full:latest`
 For app projects with mobile + web testing (plasma, pile, roster, veil):
@@ -18,13 +19,26 @@ For app projects with mobile + web testing (plasma, pile, roster, veil):
 - Android SDK 34 + emulator (Pixel 6 AVD)
 - agent-device CLI
 
+## VM Sizing
+
+| Image | Projects | Machine Type | vCPU | RAM |
+|-------|----------|-------------|------|-----|
+| light | dev-agent, seal, aqua | n2d-standard-4 | 4 | 16GB |
+| full | plasma, pile, roster, veil | n2d-standard-8 | 8 | 32GB |
+
+Full-image projects need 8 vCPU because running emulator + dev server + AI CLIs concurrently on 4 vCPU causes OOM.
+
+Override per-workspace:
+```bash
+devpod up <repo> --provider-option MACHINE_TYPE=n2d-standard-8
+```
+
 ## Usage in devcontainer.json
 
 ```json
 {
   "image": "ghcr.io/plasmapos/devcontainers/light:latest",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": { "version": "22" },
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },

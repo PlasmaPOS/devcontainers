@@ -1,8 +1,11 @@
 FROM mcr.microsoft.com/devcontainers/base:debian
 
-# Install Node system-wide (needed for Playwright install as root)
+# Install Node system-wide (needed for Playwright install as root + AI CLIs)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
+
+# Install AI CLIs as root — lands in /usr/local/bin, available to all users + non-interactive SSH
+RUN npm install -g @anthropic-ai/claude-code @openai/codex
 
 # Install bun as vscode user
 USER vscode

@@ -1,5 +1,12 @@
 FROM mcr.microsoft.com/devcontainers/base:debian
 
+# Install Node system-wide (needed for Claude Code + Codex CLIs)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
+# Install AI CLIs as root — lands in /usr/local/bin, available to all users + non-interactive SSH
+RUN npm install -g @anthropic-ai/claude-code @openai/codex
+
 # Install bun as vscode user (the default devcontainer user)
 USER vscode
 RUN curl -fsSL https://bun.sh/install | bash
@@ -7,7 +14,7 @@ RUN curl -fsSL https://bun.sh/install | bash
 ENV BUN_INSTALL="/home/vscode/.bun"
 ENV PATH="$BUN_INSTALL/bin:$PATH"
 
-# Install global tools
+# Install global tools via bun
 RUN bun add -g convex
 
 # Symlink bun into system PATH for non-interactive SSH sessions
