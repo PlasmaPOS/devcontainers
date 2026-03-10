@@ -110,8 +110,8 @@ If you are an AI agent and need to understand the environment:
 
 - **Bun**: `/home/vscode/.bun/bin/bun` (also at `/usr/local/bin/bun`)
 - **Node**: `/usr/bin/node` (v22, system-wide)
-- **Claude Code**: `/usr/local/bin/claude`
-- **Codex**: `/usr/local/bin/codex`
+- **Claude Code**: `/usr/bin/claude`
+- **Codex**: `/usr/bin/codex`
 - **Convex CLI**: `~/.bun/bin/convex` (also via `bunx convex`)
 - **Playwright browsers** (full image only): `/home/vscode/.cache/ms-playwright`
 - **Android SDK** (full image only): `/opt/android-sdk`
