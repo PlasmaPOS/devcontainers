@@ -1,12 +1,14 @@
 FROM mcr.microsoft.com/devcontainers/base:debian
 
-# Install bun
-RUN curl -fsSL https://bun.sh/install | bash \
-    && echo 'export BUN_INSTALL="$HOME/.bun"' >> /home/vscode/.bashrc \
-    && echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> /home/vscode/.bashrc
+# Install bun as vscode user
+USER vscode
+RUN curl -fsSL https://bun.sh/install | bash
 
 ENV BUN_INSTALL="/home/vscode/.bun"
 ENV PATH="$BUN_INSTALL/bin:$PATH"
+
+# Switch to root for system-level installs
+USER root
 
 # Install Playwright + Chromium
 ENV PLAYWRIGHT_BROWSERS_PATH="/home/vscode/.cache/ms-playwright"
@@ -33,4 +35,5 @@ RUN echo "no" | avdmanager create avd -n test-device -k "system-images;android-3
 # Install global tools as vscode user
 USER vscode
 RUN bun add -g convex agent-device
+
 USER root

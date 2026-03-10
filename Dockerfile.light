@@ -1,13 +1,13 @@
 FROM mcr.microsoft.com/devcontainers/base:debian
 
-# Install bun
-RUN curl -fsSL https://bun.sh/install | bash \
-    && echo 'export BUN_INSTALL="$HOME/.bun"' >> /home/vscode/.bashrc \
-    && echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> /home/vscode/.bashrc
+# Install bun as vscode user (the default devcontainer user)
+USER vscode
+RUN curl -fsSL https://bun.sh/install | bash
 
-# Install global tools
 ENV BUN_INSTALL="/home/vscode/.bun"
 ENV PATH="$BUN_INSTALL/bin:$PATH"
-USER vscode
+
+# Install global tools
 RUN bun add -g convex
+
 USER root
