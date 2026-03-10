@@ -1,5 +1,9 @@
 FROM mcr.microsoft.com/devcontainers/base:debian
 
+# Install Node system-wide (needed for Playwright install as root)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
 # Install bun as vscode user
 USER vscode
 RUN curl -fsSL https://bun.sh/install | bash
@@ -12,7 +16,8 @@ USER root
 
 # Install Playwright + Chromium
 ENV PLAYWRIGHT_BROWSERS_PATH="/home/vscode/.cache/ms-playwright"
-RUN npx playwright install --with-deps chromium
+RUN npx playwright install --with-deps chromium \
+    && chown -R vscode:vscode /home/vscode/.cache/ms-playwright
 
 # Install Android SDK
 RUN mkdir -p /opt/android-sdk/cmdline-tools \
