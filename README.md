@@ -22,7 +22,6 @@ devcontainers/
 |-------|-----------------|
 | Base | Debian (devcontainers base image) |
 | Runtime | Node.js 22 (system-wide), Bun (latest) |
-| AI CLIs | Claude Code (`claude`), Codex (`codex`) — in `/usr/local/bin` |
 | Dev tools | Convex CLI (via bun global) |
 | System | Bun symlinked to `/usr/local/bin` for non-interactive SSH |
 
@@ -89,9 +88,7 @@ docker build -f Dockerfile.full -t devcontainers-full .
 
 ## Design Decisions
 
-### Why install AI CLIs via npm as root?
-
-`npm install -g` as root places binaries directly in `/usr/local/bin`. This means `claude` and `codex` work in non-interactive SSH sessions without any PATH manipulation. Bun global installs go to `~/.bun/bin` which requires shell profile sourcing — fine for interactive use, but breaks when DevPod or scripts run commands via `ssh <host> 'command'`.
+AI CLIs (Claude Code, Codex) run **locally** on your machine — they connect to the workspace via `ssh <project>.devpod`. They are NOT installed inside the container image. This keeps the image small and avoids version drift between local AI tools and remote copies.
 
 ### Why symlink bun into `/usr/local/bin`?
 
@@ -110,11 +107,10 @@ If you are an AI agent and need to understand the environment:
 
 - **Bun**: `/home/vscode/.bun/bin/bun` (also at `/usr/local/bin/bun`)
 - **Node**: `/usr/bin/node` (v22, system-wide)
-- **Claude Code**: `/usr/bin/claude`
-- **Codex**: `/usr/bin/codex`
 - **Convex CLI**: `~/.bun/bin/convex` (also via `bunx convex`)
 - **Playwright browsers** (full image only): `/home/vscode/.cache/ms-playwright`
 - **Android SDK** (full image only): `/opt/android-sdk`
 - **Android emulator AVD** (full image only): `test-device` (Pixel 6, API 34, Google APIs x86_64)
 - **Default user**: `vscode` (the standard devcontainers user)
 - **Runtime config** (env vars, git, aliases) is handled by [PlasmaPOS/dotfiles](https://github.com/PlasmaPOS/dotfiles), not this image
+- **AI CLIs** (Claude Code, Codex) are NOT in the image — run them locally, they SSH into the workspace
